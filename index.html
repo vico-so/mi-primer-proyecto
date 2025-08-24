@@ -1,13 +1,329 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi Primer Hola Mundo</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Comandos básicos de Git — Guía dinámica</title>
+  <style>
+    :root{
+      --bg:#0f172a;          /* slate-900 */
+      --panel:#111827;       /* gray-900 */
+      --card:#0b1220;        /* custom dark */
+      --text:#e5e7eb;        /* gray-200 */
+      --muted:#9ca3af;       /* gray-400 */
+      --brand:#22d3ee;       /* cyan-400 */
+      --accent:#34d399;      /* emerald-400 */
+      --border:#1f2937;      /* gray-800 */
+      --code-bg:#0b1220;
+      --chip:#111827;
+    }
+    :root.light{
+      --bg:#f8fafc;         /* slate-50 */
+      --panel:#ffffff;       /* white */
+      --card:#ffffff;
+      --text:#0f172a;        /* slate-900 */
+      --muted:#475569;       /* slate-600 */
+      --brand:#0891b2;       /* cyan-700 */
+      --accent:#059669;      /* emerald-600 */
+      --border:#e2e8f0;      /* slate-200 */
+      --code-bg:#0f172a10;   /* faint */
+      --chip:#f1f5f9;        /* slate-100 */
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, "Helvetica Neue", Arial;
+      background:linear-gradient(180deg,var(--bg),#030712); color:var(--text);
+    }
+    header{
+      position:sticky; top:0; z-index:10; backdrop-filter:saturate(140%) blur(8px);
+      background:linear-gradient(180deg, var(--panel), transparent);
+      border-bottom:1px solid var(--border);
+    }
+    .wrap{max-width:1100px; margin:0 auto; padding:1.2rem 1rem}
+    .h1{font-size:clamp(1.4rem,2.4vw,2rem); font-weight:800; letter-spacing:.2px; display:flex; align-items:center; gap:.6rem}
+    .h1 .badge{font-size:.8rem; font-weight:700; color:var(--panel); background:linear-gradient(90deg,var(--brand),var(--accent)); padding:.2rem .5rem; border-radius:999px}
+    .controls{display:grid; grid-template-columns: 1fr 170px 170px 48px 48px; gap:.6rem; margin-top:.8rem}
+    .controls input,.controls select,.controls button{
+      border:1px solid var(--border); background:var(--card); color:var(--text);
+      padding:.65rem .75rem; border-radius:.8rem; outline:none; font-size:.95rem;
+    }
+    .controls input::placeholder{color:var(--muted)}
+    .controls button{cursor:pointer}
+    .btn{display:inline-flex; align-items:center; justify-content:center; gap:.4rem}
+    .btn svg{width:18px; height:18px}
+
+    .chips{display:flex; flex-wrap:wrap; gap:.4rem; margin-top:.6rem}
+    .chip{font-size:.78rem; padding:.28rem .55rem; border:1px solid var(--border); background:var(--chip); color:var(--muted); border-radius:999px}
+
+    main{padding:1rem}
+    .grid{max-width:1100px; margin:0 auto; display:grid; gap:12px; grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
+
+    .card{
+      border:1px solid var(--border); background:linear-gradient(180deg, var(--card), rgba(255,255,255,0.02));
+      border-radius:16px; padding:14px; display:flex; flex-direction:column; gap:10px;
+      transition: transform .12s ease, box-shadow .12s ease, border-color .2s ease;
+    }
+    .card:hover{transform: translateY(-2px); box-shadow:0 10px 30px #00000040; border-color:#3b82f6aa}
+    .card h3{margin:0; font-size:1.05rem}
+    .card p{margin:0; color:var(--muted); font-size:.93rem; line-height:1.35}
+
+    .code{
+      background:var(--code-bg); border:1px dashed var(--border); border-radius:12px;
+      padding:10px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size:.92rem;
+      position:relative; white-space:pre-wrap; word-break:break-word
+    }
+    .code .copy{
+      position:absolute; top:8px; right:8px; border:1px solid var(--border); background:var(--panel);
+      padding:.25rem .5rem; border-radius:8px; cursor:pointer; font-size:.8rem; color:var(--text)
+    }
+
+    .meta{display:flex; align-items:center; justify-content:space-between; gap:.5rem}
+    .tags{display:flex; gap:.35rem; flex-wrap:wrap}
+    .tag{font-size:.72rem; padding:.22rem .45rem; border-radius:999px; border:1px solid var(--border); color:var(--muted)}
+
+    .kbd{border:1px solid var(--border); background:var(--chip); padding:.15rem .35rem; border-radius:6px; font-size:.8rem}
+
+    footer{max-width:1100px; margin:30px auto; color:var(--muted); padding:0 1rem 2rem}
+    .hidden{display:none !important}
+  </style>
 </head>
 <body>
+  <header>
+    <div class="wrap">
+      <div class="h1">
+        <span>📚 Comandos básicos de Git</span>
+        <span class="badge">dinámico</span>
+      </div>
+      <div class="controls">
+        <input id="q" type="search" placeholder="Buscar comando, ejemplo o descripción (e.g., commit, revert)…"/>
+        <select id="cat">
+          <option value="">Todas las categorías</option>
+          <option value="config">Configuración</option>
+          <option value="inicio">Inicio de repo</option>
+          <option value="estado">Estado & cambios</option>
+          <option value="historial">Historial</option>
+          <option value="ramas">Ramas</option>
+          <option value="remotos">Remotos</option>
+          <option value="etiquetas">Etiquetas & versiones</option>
+          <option value="stash">Stash</option>
+          <option value="deshacer">Deshacer</option>
+        </select>
+        <select id="lvl">
+          <option value="">Todos los niveles</option>
+          <option value="basico">Básico</option>
+          <option value="intermedio">Intermedio</option>
+          <option value="avanzado">Avanzado</option>
+        </select>
+        <button id="toggleTheme" class="btn" title="Cambiar tema" aria-label="Cambiar tema">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9Z"/></svg>
+        </button>
+        <button id="clear" class="btn" title="Limpiar filtros" aria-label="Limpiar filtros">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M6 6v12a3 3 0 0 0 3 3h6a3 3 0 0 0 3-3V6"/><path d="M10 11v6M14 11v6"/></svg>
+        </button>
+      </div>
+      <div class="chips" id="quick">
+        <!-- chips rápidas -->
+      </div>
+    </div>
+  </header>
 
-    <h1>¡Hola Mundo!</h1>
+  <main>
+    <section class="grid" id="grid"></section>
+  </main>
 
+  <footer>
+    <p>Consejo: presiona <span class="kbd">/</span> para enfocar la búsqueda. Haz clic en <strong>Copiar</strong> para llevar cualquier comando a tu portapapeles.</p>
+  </footer>
+
+  <script>
+    // Datos de comandos
+    const COMMANDS = [
+      {name:'git config', cat:'config', lvl:'basico', 
+        desc:'Configura nombre y correo; nivel global o del repo.',
+        usage:`git config --global user.name "Tu Nombre"\ngit config --global user.email "tu@correo.com"\ngit config --list`,
+        tags:['setup','identidad','global']},
+      {name:'git init', cat:'inicio', lvl:'basico',
+        desc:'Crea un repositorio vacío en la carpeta actual.',
+        usage:'git init', tags:['nuevo repo','local']},
+      {name:'git clone', cat:'inicio', lvl:'basico',
+        desc:'Clona un repositorio remoto a local.',
+        usage:'git clone https://servidor/usuario/proyecto.git', tags:['descargar','remoto']},
+      {name:'git status', cat:'estado', lvl:'basico',
+        desc:'Muestra estado de archivos: staged, unstaged y sin seguimiento.',
+        usage:'git status -sb', tags:['resumen','cambios']},
+      {name:'git add', cat:'estado', lvl:'basico',
+        desc:'Agrega cambios al área de preparación (staging).',
+        usage:'git add archivo.js\n# o todo\ngit add .', tags:['staging','preparar']},
+      {name:'git commit', cat:'estado', lvl:'basico',
+        desc:'Registra instantánea de los cambios preparados.',
+        usage:'git commit -m "feat: mensaje claro"', tags:['instantánea','historial']},
+      {name:'git log', cat:'historial', lvl:'basico',
+        desc:'Historial de commits con varias vistas.',
+        usage:'git log --oneline --graph --decorate --all', tags:['gráfico','revisión']},
+      {name:'git diff', cat:'estado', lvl:'intermedio',
+        desc:'Muestra diferencias entre versiones y áreas.',
+        usage:'git diff\n# staged vs último commit\ngit diff --staged', tags:['comparar']},
+      {name:'git branch', cat:'ramas', lvl:'basico',
+        desc:'Lista, crea o elimina ramas.',
+        usage:'git branch\ngit branch nueva-rama\ngit branch -d rama', tags:['listado','crear','borrar']},
+      {name:'git switch / checkout', cat:'ramas', lvl:'basico',
+        desc:'Cambia entre ramas o crea y cambia.',
+        usage:'git switch nombre-rama\n# crear y cambiar\ngit switch -c nueva-rama', tags:['moverse','contexto']},
+      {name:'git merge', cat:'ramas', lvl:'intermedio',
+        desc:'Combina cambios de otra rama en la actual.',
+        usage:'git merge nombre-rama', tags:['integrar','fast-forward']},
+      {name:'git rebase', cat:'ramas', lvl:'avanzado',
+        desc:'Reaplica commits sobre otra base para un historial lineal.',
+        usage:'git rebase main', tags:['lineal','historial limpio']},
+      {name:'git remote', cat:'remotos', lvl:'basico',
+        desc:'Gestiona orígenes remotos.',
+        usage:'git remote -v\ngit remote add origin URL', tags:['origin','urls']},
+      {name:'git fetch', cat:'remotos', lvl:'intermedio',
+        desc:'Descarga referencias del remoto sin fusionar.',
+        usage:'git fetch origin', tags:['actualizar','seguimiento']},
+      {name:'git pull', cat:'remotos', lvl:'basico',
+        desc:'Descarga y fusiona cambios del remoto en la rama actual.',
+        usage:'git pull origin main', tags:['sincronizar']},
+      {name:'git push', cat:'remotos', lvl:'basico',
+        desc:'Envía tus commits al remoto.',
+        usage:'git push -u origin main', tags:['publicar','upstream']},
+      {name:'git stash', cat:'stash', lvl:'intermedio',
+        desc:'Guarda cambios temporales sin cometer.',
+        usage:'git stash push -m "wip"\ngit stash list\ngit stash pop', tags:['temporal','wip']},
+      {name:'git tag', cat:'etiquetas', lvl:'intermedio',
+        desc:'Crea etiquetas (versiones) para puntos específicos.',
+        usage:'git tag v1.0.0\n# anotada\ngit tag -a v1.0.0 -m "versión 1"', tags:['versionado','release']},
+      {name:'git reset', cat:'deshacer', lvl:'avanzado',
+        desc:'Mueve HEAD y opcionalmente staging/working dir.',
+        usage:'git reset --soft HEAD~1\ngit reset --mixed HEAD~1\ngit reset --hard HEAD~1', tags:['deshacer','peligroso']},
+      {name:'git revert', cat:'deshacer', lvl:'intermedio',
+        desc:'Crea un commit que revierte un commit previo (seguro).',
+        usage:'git revert <hash>', tags:['rollback','seguro']},
+      {name:'.gitignore', cat:'config', lvl:'basico',
+        desc:'Define archivos/carpetas a ignorar por Git.',
+        usage:'# ejemplo\nnode_modules/\n.env\n*.log', tags:['limpieza','ruido']},
+      {name:'git rm / mv', cat:'estado', lvl:'intermedio',
+        desc:'Elimina o mueve archivos manteniendo el historial.',
+        usage:'git rm archivo.txt\ngit mv viejo.txt nuevo.txt', tags:['borrar','mover']},
+      {name:'git show', cat:'historial', lvl:'intermedio',
+        desc:'Muestra detalles de un objeto (commit, tag, etc.).',
+        usage:'git show <hash>', tags:['detalle','objeto']},
+      {name:'git restore', cat:'deshacer', lvl:'intermedio',
+        desc:'Restaura contenido de archivos desde HEAD o índice.',
+        usage:'git restore archivo.txt\n# desde staging\ngit restore --staged archivo.txt', tags:['recuperar']},
+    ];
+
+    // Render dinámico
+    const grid = document.getElementById('grid');
+    const q = document.getElementById('q');
+    const cat = document.getElementById('cat');
+    const lvl = document.getElementById('lvl');
+    const clearBtn = document.getElementById('clear');
+    const toggleTheme = document.getElementById('toggleTheme');
+    const quick = document.getElementById('quick');
+
+    const QUICK_CHIPS = [
+      ['⭐ Básicos','lvl:basico'],
+      ['🔀 Ramas','cat:ramas'],
+      ['☁️ Remotos','cat:remotos'],
+      ['🧹 Deshacer','cat:deshacer'],
+      ['🧪 Stash','cat:stash'],
+      ['🏷️ Tags','cat:etiquetas'],
+      ['📜 Historial','cat:historial'],
+    ];
+
+    function makeChip([label, value]){
+      const b = document.createElement('button');
+      b.className='chip';
+      b.textContent=label;
+      b.onclick=()=>{
+        if(value.startsWith('lvl:')){ lvl.value=value.split(':')[1] }
+        if(value.startsWith('cat:')){ cat.value=value.split(':')[1] }
+        applyFilters();
+      };
+      return b;
+    }
+
+    QUICK_CHIPS.forEach(c=>quick.appendChild(makeChip(c)));
+
+    function cardTemplate(cmd){
+      const id = cmd.name.toLowerCase().replace(/[^a-z0-9]+/g,'-');
+      return `
+        <article class="card" data-cat="${cmd.cat}" data-lvl="${cmd.lvl}" data-id="${id}">
+          <div class="meta">
+            <h3>${cmd.name}</h3>
+            <div class="tags">
+              <span class="tag">${cmd.lvl}</span>
+              <span class="tag">${cmd.cat}</span>
+            </div>
+          </div>
+          <p>${cmd.desc}</p>
+          <div class="code"><button class="copy" data-copy="usage-${id}">Copiar</button><code id="usage-${id}">${cmd.usage}</code></div>
+          <div class="tags">${cmd.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+        </article>
+      `;
+    }
+
+    function render(list){
+      grid.innerHTML = list.map(cardTemplate).join('');
+      // activar copiado
+      grid.querySelectorAll('.copy').forEach(btn=>{
+        btn.addEventListener('click', async (e)=>{
+          const code = document.getElementById(btn.dataset.copy).innerText;
+          try{
+            await navigator.clipboard.writeText(code);
+            btn.textContent='✔ Copiado';
+            setTimeout(()=>btn.textContent='Copiar',1200);
+          }catch(err){
+            btn.textContent='Copiado*';
+            setTimeout(()=>btn.textContent='Copiar',1200);
+          }
+        })
+      })
+    }
+
+    function applyFilters(){
+      const term = q.value.trim().toLowerCase();
+      const c = cat.value; const l = lvl.value;
+      const filtered = COMMANDS.filter(cmd=>{
+        const matchesTerm = !term || (
+          cmd.name.toLowerCase().includes(term) ||
+          cmd.desc.toLowerCase().includes(term) ||
+          cmd.usage.toLowerCase().includes(term) ||
+          cmd.tags.join(' ').toLowerCase().includes(term)
+        );
+        const matchesCat = !c || cmd.cat === c;
+        const matchesLvl = !l || cmd.lvl === l;
+        return matchesTerm && matchesCat && matchesLvl;
+      });
+      render(filtered);
+    }
+
+    q.addEventListener('input', applyFilters);
+    cat.addEventListener('change', applyFilters);
+    lvl.addEventListener('change', applyFilters);
+    clearBtn.addEventListener('click', ()=>{ q.value=''; cat.value=''; lvl.value=''; applyFilters(); q.focus(); });
+
+    // Atajo de teclado para buscar
+    window.addEventListener('keydown', (e)=>{ if(e.key==='/' && document.activeElement!==q){ e.preventDefault(); q.focus(); } });
+
+    // Tema (persistente)
+    const THEME_KEY='git-cards-theme';
+    function setTheme(mode){
+      if(mode==='light'){ document.documentElement.classList.add('light'); }
+      else{ document.documentElement.classList.remove('light'); }
+      localStorage.setItem(THEME_KEY, mode);
+    }
+    toggleTheme.addEventListener('click',()=>{
+      const current = localStorage.getItem(THEME_KEY)||'dark';
+      setTheme(current==='dark'?'light':'dark');
+    });
+    setTheme(localStorage.getItem(THEME_KEY)||'dark');
+
+    // Primera carga
+    render(COMMANDS);
+  </script>
 </body>
 </html>
+
