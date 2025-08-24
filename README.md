@@ -1,5 +1,5 @@
-## mi-primer-proyecto- VICTOR
-# Juan
-# Carlitos
-# Camila 
-# Araceli
+# mi-primer-proyecto- VICTOR
+### Juan
+### Carlitos
+### Camila 
+### Araceli
